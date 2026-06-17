@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="assets/4a473bc6.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 
 
@@ -571,7 +574,16 @@
       <div style="position: relative; animation: mt-float 7s ease-in-out infinite;">
         <div style="position: absolute; inset: -14px; background: linear-gradient(135deg, #A435EF, #2E0A6E); border-radius: 32px; filter: blur(2px); opacity: .9;"></div>
         <div style="position: relative; width: 100%; height: 540px; border-radius: 26px; overflow: hidden; background: #150521;">
-          <img src="assets/juPerfil.png" alt="Ju Barbosa" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 16%; display: block;">
+          <img data-pimg="hero" src="assets/juPerfil.png" alt="Ju Barbosa" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 16%; display: block;">
+          <sc-if value="{{ adminMode }}" hint-placeholder-val="{{ false }}">
+            <div data-pcard="hero" onclick="{{ onPickPortrait }}" title="Trocar foto do topo" style="position: absolute; bottom: 12px; right: 12px; z-index: 5; display: inline-flex; align-items: center; gap: 7px; padding: 9px 15px; border-radius: 999px; background: rgba(13,5,20,.85); border: 1px solid rgba(164,53,239,.5); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; backdrop-filter: blur(6px);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A6F3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"></rect><circle cx="12" cy="13" r="3.5"></circle><path d="M8 6l1.2-2h5.6L16 6"></path></svg>
+              Trocar foto
+            </div>
+            <div data-pcard="hero" onclick="{{ onRemovePortrait }}" title="Excluir foto enviada" style="position: absolute; bottom: 12px; left: 12px; z-index: 5; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(40,6,14,.82); border: 1px solid rgba(255,77,109,.55); color: #fff; cursor: pointer; backdrop-filter: blur(6px);">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ff8da1" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6M14 11v6"></path></svg>
+            </div>
+          </sc-if>
         </div>
         <div style="position: absolute; bottom: 22px; left: 22px; right: 22px; background: rgba(13,5,20,.72); backdrop-filter: blur(10px); border: 1px solid rgba(164,53,239,.3); border-radius: 18px; padding: 16px 18px; display: flex; align-items: center; gap: 14px;">
           
@@ -644,6 +656,11 @@
           <sc-if value="{{ adminMode }}" hint-placeholder-val="{{ false }}">
             <div onclick="{{ onPickPhoto }}" title="Adicionar / trocar foto" style="position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border-radius: 50%; background: rgba(13,5,20,.62); backdrop-filter: blur(6px); border: 1px solid rgba(164,53,239,.45); display: flex; align-items: center; justify-content: center; cursor: pointer;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A6F3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"></rect><circle cx="12" cy="13" r="3.5"></circle><path d="M8 6l1.2-2h5.6L16 6"></path></svg>
+            </div>
+          </sc-if>
+          <sc-if value="{{ adminMode }}" hint-placeholder-val="{{ false }}">
+            <div onclick="{{ onRemovePhoto }}" title="Excluir esta foto" style="position: absolute; top: 12px; right: 58px; width: 38px; height: 38px; border-radius: 50%; background: rgba(40,6,14,.72); backdrop-filter: blur(6px); border: 1px solid rgba(255,77,109,.55); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ff8da1" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6M14 11v6"></path></svg>
             </div>
           </sc-if>
           <sc-if value="{{ adminMode }}" hint-placeholder-val="{{ false }}">
@@ -723,7 +740,16 @@
   <section style="max-width: 1200px; margin: 0 auto; padding: 80px 28px 30px;">
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 44px; align-items: center;">
       <div style="position: relative; width: 100%; height: 440px; border-radius: 24px; overflow: hidden; background: #150521;">
-        <img src="assets/juAbout.png" alt="Ju Barbosa no studio" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block;">
+        <img data-pimg="about" src="assets/juAbout.png" alt="Ju Barbosa no studio" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block;">
+        <sc-if value="{{ adminMode }}" hint-placeholder-val="{{ false }}">
+          <div data-pcard="about" onclick="{{ onPickPortrait }}" title="Trocar foto" style="position: absolute; bottom: 12px; right: 12px; z-index: 5; display: inline-flex; align-items: center; gap: 7px; padding: 9px 15px; border-radius: 999px; background: rgba(13,5,20,.85); border: 1px solid rgba(164,53,239,.5); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; backdrop-filter: blur(6px);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A6F3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"></rect><circle cx="12" cy="13" r="3.5"></circle><path d="M8 6l1.2-2h5.6L16 6"></path></svg>
+            Trocar foto
+          </div>
+          <div data-pcard="about" onclick="{{ onRemovePortrait }}" title="Excluir foto enviada" style="position: absolute; bottom: 12px; left: 12px; z-index: 5; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(40,6,14,.82); border: 1px solid rgba(255,77,109,.55); color: #fff; cursor: pointer; backdrop-filter: blur(6px);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ff8da1" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6M14 11v6"></path></svg>
+          </div>
+        </sc-if>
       </div>
       <div>
         <div style="color: #B57BEC; font-weight: 800; letter-spacing: 3px; font-size: 13px; text-transform: uppercase;">Quem cuida de você</div>
@@ -767,6 +793,27 @@
           </div>
         </div>
       </div>
+
+      <!-- Como chegar -->
+      <div style="position: relative; margin-top: 34px; padding-top: 30px; border-top: 1px solid rgba(164,53,239,.18);">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+          <div style="width: 42px; height: 42px; flex: none; border-radius: 12px; background: rgba(164,53,239,.14); display:flex; align-items:center; justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B57BEC" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg></div>
+          <div><div style="font-family:'Archivo'; font-weight: 900; font-size: 22px; color: #fff; line-height: 1;">Como chegar</div><div style="color: #9C8392; font-size: 13px; margin-top: 4px;">Rua Avanhandava, 10 — Cidade Nova I, Itu / SP</div></div>
+        </div>
+        <div style="border-radius: 18px; overflow: hidden; border: 1px solid rgba(164,53,239,.25); box-shadow: 0 14px 34px rgba(0,0,0,.4);">
+          <iframe title="Mapa — Salão MEGATOP" src="https://www.google.com/maps?q=Rua%20Avanhandava%2C%2010%20-%20Cidade%20Nova%20I%2C%20Itu%20-%20SP&output=embed" width="100%" height="300" style="border: 0; display: block;" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
+          <a href="https://www.google.com/maps/dir/?api=1&destination=Rua%20Avanhandava%2C%2010%20-%20Cidade%20Nova%20I%2C%20Itu%20-%20SP" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 9px; background: linear-gradient(135deg, #A435EF, #7C1FC6); color: #fff; text-decoration: none; font-weight: 800; font-size: 15px; padding: 14px 24px; border-radius: 999px; box-shadow: 0 12px 28px rgba(164,53,239,.35);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+            Traçar rota no Google Maps
+          </a>
+          <a href="https://waze.com/ul?q=Rua%20Avanhandava%2C%2010%2C%20Itu%20SP&navigate=yes" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 9px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16); color: #fff; text-decoration: none; font-weight: 700; font-size: 15px; padding: 14px 24px; border-radius: 999px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A6F3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+            Abrir no Waze
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -793,23 +840,71 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script="">
 class Component extends DCLogic {
-  ADMIN_PASS = 'megatop2026';
-  state = { cd: { d: '00', h: '00', m: '00', s: '00' }, lb: { open: false, index: 0, anim: 0 }, vlb: { open: false, url: null, anim: 0 }, adminMode: false, loginOpen: false, loginErr: false, menuOpen: false };
+  // Config do Firebase (projeto salaomegatop)
+  FB_CONFIG = {
+    apiKey: "AIzaSyCzn8EuL32S_2_PSMTSx9owla6EQAnESk4",
+    authDomain: "salaomegatop-47f1f.firebaseapp.com",
+    projectId: "salaomegatop-47f1f",
+    storageBucket: "salaomegatop-47f1f.firebasestorage.app",
+    messagingSenderId: "299586684619",
+    appId: "1:299586684619:web:2156f76cbc83b5fafc7d4e"
+  };
+  state = { cd: { d: '00', h: '00', m: '00', s: '00' }, lb: { open: false, index: 0, anim: 0 }, vlb: { open: false, url: null, anim: 0 }, adminMode: false, loginOpen: false, loginErr: false, loginBusy: false, menuOpen: false };
+
+  // Liga o Firebase: autenticação + banco (Firestore).
+  initFirebase() {
+    if (this._fbInit) return;
+    try {
+      if (typeof firebase === 'undefined') return;
+      if (!firebase.apps || !firebase.apps.length) firebase.initializeApp(this.FB_CONFIG);
+      this._auth = firebase.auth();
+      this._db = firebase.firestore();
+      this._fbInit = true;
+      this._auth.onAuthStateChanged((user) => {
+        this.setState({ adminMode: !!user, loginOpen: false, loginErr: false, loginBusy: false });
+        setTimeout(() => { this.buildGallery(); this.buildPortraits(); }, 80);
+      });
+      this.loadFirebaseData();
+    } catch (e) { console.warn('Firebase indisponível:', e); }
+  }
+
+  // Lê as fotos salvas no Firestore para os caches em memória e aplica na tela.
+  async loadFirebaseData() {
+    this._fbGallery = this._fbGallery || {};
+    this._fbPortraits = this._fbPortraits || {};
+    if (!this._db) return;
+    try {
+      const gs = await this._db.collection('gallery').get();
+      gs.forEach((d) => { const v = d.data(); if (v && v.url) this._fbGallery[d.id] = v.url; });
+    } catch (e) {}
+    try {
+      const ps = await this._db.collection('portraits').get();
+      ps.forEach((d) => { const v = d.data(); if (v && v.url) this._fbPortraits[d.id] = v.url; });
+    } catch (e) {}
+    this.buildGallery();
+    this.buildPortraits();
+  }
 
   openLogin() { this._pw = ''; this.setState({ loginOpen: true, loginErr: false, menuOpen: false }); }
   toggleMenu() { this.setState({ menuOpen: !this.state.menuOpen }); }
   closeMenu() { this.setState({ menuOpen: false }); }
-  closeLogin() { this.setState({ loginOpen: false, loginErr: false }); }
+  closeLogin() { this.setState({ loginOpen: false, loginErr: false, loginBusy: false }); }
+  onEmailInput(e) { this._email = e.target.value; }
   onPwInput(e) { this._pw = e.target.value; }
   doLogin() {
-    if ((this._pw || '') === this.ADMIN_PASS) {
-      this.setState({ adminMode: true, loginOpen: false, loginErr: false });
-      setTimeout(() => this.buildGallery(), 60);
-    } else {
-      this.setState({ loginErr: true });
-    }
+    const email = (this._email || '').trim();
+    const pw = this._pw || '';
+    if (!email || !pw || !this._auth) { this.setState({ loginErr: true }); return; }
+    this.setState({ loginErr: false, loginBusy: true });
+    this._auth.signInWithEmailAndPassword(email, pw)
+      .then(() => { this.setState({ loginOpen: false, loginErr: false, loginBusy: false }); })
+      .catch(() => { this.setState({ loginErr: true, loginBusy: false }); });
   }
-  logout() { this.setState({ adminMode: false }); setTimeout(() => this.buildGallery(), 60); }
+  logout() {
+    if (this._auth) { try { this._auth.signOut(); } catch (e) {} }
+    this.setState({ adminMode: false });
+    setTimeout(() => { this.buildGallery(); this.buildPortraits(); }, 60);
+  }
 
   GALLERY_COUNT = 12;
   VIDEO_COUNT = 3;
@@ -823,8 +918,10 @@ class Component extends DCLogic {
     };
     this.tick();
     this._t = setInterval(() => this.tick(), 1000);
+    this.initFirebase();
     this.buildGallery();
     this.buildVideos();
+    this.buildPortraits();
   }
 
   // Returns the default URL for slot i. Cards 1-7 are the salon's real
@@ -837,12 +934,11 @@ class Component extends DCLogic {
   }
 
   // Returns the real photo URL for slot i, or null if the slot is empty.
-  // Slots 1-7 have embedded photos; a localStorage upload overrides any slot.
-  // Empty slots (8-12 by default) return null so they stay hidden in public.
+  // Prioridade: foto salva no Firebase (vale pra todos) > foto padrão do site.
+  // Slots 8-12 sem nada retornam null para ficarem escondidos no público.
   photoUrl(i) {
-    let saved = null;
-    try { saved = localStorage.getItem('mt-gallery-' + i); } catch (e) {}
-    if (saved) return saved;
+    const fb = (this._fbGallery || {})[i];
+    if (fb) return fb;
     const R = (typeof window !== 'undefined' && window.__resources) || {};
     if (i <= 7) return R['foto' + i] || ('assets/foto-' + i + '.jpg');
     return null;
@@ -953,24 +1049,41 @@ class Component extends DCLogic {
   async ingestPhoto(idx, file) {
     try {
       const dataUrl = await this.resizePhoto(file, 900);
-      try {
-        localStorage.setItem('mt-gallery-' + idx, dataUrl);
-      } catch (e) {
-        alert('A foto é muito grande para salvar no navegador. Tente uma imagem menor.');
-        return;
-      }
+      if (dataUrl.length > 950000) { alert('Essa imagem ficou muito grande. Tente uma foto um pouco menor.'); return; }
+      // Mostra na hora
       const root = (this.el && this.el.shadowRoot) || document;
       const img = root.querySelector('[data-gimg="' + idx + '"]') || document.querySelector('[data-gimg="' + idx + '"]');
       const empty = root.querySelector('[data-gempty="' + idx + '"]') || document.querySelector('[data-gempty="' + idx + '"]');
       if (img) { img.style.backgroundImage = 'url("' + dataUrl + '")'; img.style.display = 'block'; }
       if (empty) empty.style.display = 'none';
+      // Salva no Firebase (vale para todos os dispositivos)
+      this._fbGallery = this._fbGallery || {};
+      this._fbGallery[idx] = dataUrl;
+      if (this._db) {
+        await this._db.collection('gallery').doc(String(idx)).set({ url: dataUrl, ts: Date.now() });
+      } else {
+        alert('Foto exibida, mas o Firebase não está disponível agora — ela pode não ficar salva online. Recarregue e tente de novo.');
+      }
     } catch (e) {
-      alert('Não foi possível carregar essa imagem. Tente outra.');
+      alert('Não foi possível salvar essa imagem. Verifique sua conexão e tente outra.');
     }
   }
 
-  // Downscale to maxW and re-encode as JPEG so it fits comfortably in
-  // localStorage. Keeps aspect ratio; works offline in the exported file.
+  // Remove a foto enviada de uma vaga da galeria e volta ao padrão
+  // (fotos 1-7 voltam à original; 8-12 voltam a ficar vazias).
+  removePhoto(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (!this.state.adminMode) return;
+    const host = e.currentTarget.closest ? e.currentTarget.closest('[data-gcard]') : null;
+    const card = host || e.currentTarget;
+    const idx = card && card.getAttribute('data-gcard');
+    if (!idx) return;
+    if (!confirm('Excluir esta foto? Ela voltará para a foto original do site.')) return;
+    if (this._fbGallery) delete this._fbGallery[idx];
+    this.buildGallery();
+    if (this._db) { this._db.collection('gallery').doc(String(idx)).delete().catch(() => {}); }
+  }
+
   resizePhoto(file, maxW) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -994,6 +1107,85 @@ class Component extends DCLogic {
   }
 
   componentWillUnmount() { clearInterval(this._t); }
+
+  // ---- Fotos fixas (topo + sobre) editáveis no modo admin ----
+  // Aplica no <img data-pimg="..."> a foto salva no Firebase, ou a original.
+  buildPortraits() {
+    const keys = ['hero', 'about'];
+    const tries = (n) => {
+      const root = (this.el && this.el.shadowRoot) || document;
+      let found = 0;
+      keys.forEach((key) => {
+        const img = root.querySelector('[data-pimg="' + key + '"]') || document.querySelector('[data-pimg="' + key + '"]');
+        if (img) {
+          found++;
+          const saved = (this._fbPortraits || {})[key];
+          const target = saved || this.PORTRAIT_DEFAULT[key];
+          if (target && img.getAttribute('src') !== target) img.src = target;
+        }
+      });
+      if (found < keys.length && n < 30) setTimeout(() => tries(n + 1), 120);
+    };
+    tries(0);
+  }
+
+  pickPortrait(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (!this.state.adminMode) return;
+    const btn = e.currentTarget.closest ? (e.currentTarget.closest('[data-pcard]') || e.currentTarget) : e.currentTarget;
+    const key = btn.getAttribute('data-pcard');
+    if (!key) return;
+    if (!this._pInput) {
+      const inp = document.createElement('input');
+      inp.type = 'file'; inp.accept = 'image/*'; inp.style.display = 'none';
+      document.body.appendChild(inp);
+      inp.addEventListener('change', () => {
+        const f = inp.files && inp.files[0];
+        inp.value = '';
+        if (f) this.ingestPortrait(this._pPendingKey, f);
+      });
+      this._pInput = inp;
+    }
+    this._pPendingKey = key;
+    this._pInput.click();
+  }
+
+  async ingestPortrait(key, file) {
+    try {
+      const dataUrl = await this.resizePhoto(file, 1000);
+      if (dataUrl.length > 950000) { alert('Essa imagem ficou muito grande. Tente uma foto um pouco menor.'); return; }
+      const root = (this.el && this.el.shadowRoot) || document;
+      const img = root.querySelector('[data-pimg="' + key + '"]') || document.querySelector('[data-pimg="' + key + '"]');
+      if (img) img.src = dataUrl;
+      this._fbPortraits = this._fbPortraits || {};
+      this._fbPortraits[key] = dataUrl;
+      if (this._db) {
+        await this._db.collection('portraits').doc(String(key)).set({ url: dataUrl, ts: Date.now() });
+      } else {
+        alert('Foto exibida, mas o Firebase não está disponível agora — ela pode não ficar salva online. Recarregue e tente de novo.');
+      }
+    } catch (e) {
+      alert('Não foi possível salvar essa imagem. Verifique sua conexão e tente outra.');
+    }
+  }
+
+  // Foto original de cada retrato fixo, para voltar ao excluir o upload.
+  PORTRAIT_DEFAULT = { hero: 'assets/juPerfil.png', about: 'assets/juAbout.png' };
+
+  removePortrait(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (!this.state.adminMode) return;
+    const btn = e.currentTarget.closest ? (e.currentTarget.closest('[data-pcard]') || e.currentTarget) : e.currentTarget;
+    const key = btn && btn.getAttribute('data-pcard');
+    if (!key) return;
+    if (!confirm('Excluir esta foto? Ela voltará para a foto original do site.')) return;
+    if (this._fbPortraits) delete this._fbPortraits[key];
+    const root = (this.el && this.el.shadowRoot) || document;
+    const img = root.querySelector('[data-pimg="' + key + '"]') || document.querySelector('[data-pimg="' + key + '"]');
+    if (img) img.src = this.PORTRAIT_DEFAULT[key] || img.src;
+    if (this._db) { this._db.collection('portraits').doc(String(key)).delete().catch(() => {}); }
+  }
+
 
   // ---- Videos ----
   buildVideos() {
@@ -1290,9 +1482,20 @@ class Component extends DCLogic {
           h('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: '#B57BEC', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
             h('rect', { x: 4, y: 11, width: 16, height: 10, rx: 2 }), h('path', { d: 'M8 11V7a4 4 0 0 1 8 0v4' }))),
         h('div', { key: 't', style: { fontFamily: "'Archivo', sans-serif", fontWeight: 900, fontSize: '22px', color: '#fff', textAlign: 'center' } }, 'Área da administradora'),
-        h('div', { key: 's', style: { color: '#B9A0AF', fontSize: '14px', textAlign: 'center', margin: '6px 0 18px' } }, 'Digite a senha para gerenciar as fotos'),
+        h('div', { key: 's', style: { color: '#B9A0AF', fontSize: '14px', textAlign: 'center', margin: '6px 0 18px' } }, 'Entre com seu e-mail e senha para gerenciar as fotos'),
         h('input', {
-          key: 'pw', type: 'password', placeholder: 'Senha', autoFocus: true,
+          key: 'em', type: 'email', placeholder: 'E-mail', autoFocus: true, autoComplete: 'username',
+          onInput: (ev) => this.onEmailInput(ev),
+          onKeyDown: (ev) => { if (ev.key === 'Enter') this.doLogin(); },
+          style: {
+            width: '100%', boxSizing: 'border-box', padding: '13px 16px', borderRadius: '12px',
+            border: '1px solid ' + (loginErr ? '#ff4d6d' : 'rgba(255,255,255,.16)'),
+            background: 'rgba(255,255,255,.05)', color: '#fff', fontSize: '15px', outline: 'none',
+            fontFamily: "'Manrope', sans-serif", marginBottom: '10px',
+          },
+        }),
+        h('input', {
+          key: 'pw', type: 'password', placeholder: 'Senha', autoComplete: 'current-password',
           onInput: (ev) => this.onPwInput(ev),
           onKeyDown: (ev) => { if (ev.key === 'Enter') this.doLogin(); },
           style: {
@@ -1302,16 +1505,16 @@ class Component extends DCLogic {
             fontFamily: "'Manrope', sans-serif",
           },
         }),
-        loginErr ? h('div', { key: 'e', style: { color: '#ff7d96', fontSize: '13px', marginTop: '8px', textAlign: 'center' } }, 'Senha incorreta. Tente novamente.') : null,
+        loginErr ? h('div', { key: 'e', style: { color: '#ff7d96', fontSize: '13px', marginTop: '8px', textAlign: 'center' } }, 'E-mail ou senha incorretos. Tente novamente.') : null,
         h('button', {
           key: 'b', onClick: () => this.doLogin(),
           style: {
             width: '100%', marginTop: '16px', padding: '14px', borderRadius: '999px', border: 'none',
             background: 'linear-gradient(135deg,#A435EF,#7C1FC6)', color: '#fff', fontWeight: 800,
             fontSize: '15px', cursor: 'pointer', fontFamily: "'Manrope', sans-serif",
-            boxShadow: '0 10px 26px rgba(164,53,239,.4)',
+            boxShadow: '0 10px 26px rgba(164,53,239,.4)', opacity: this.state.loginBusy ? 0.7 : 1,
           },
-        }, 'Entrar'),
+        }, this.state.loginBusy ? 'Entrando…' : 'Entrar'),
         h('button', {
           key: 'c', onClick: () => this.closeLogin(),
           style: { width: '100%', marginTop: '10px', padding: '10px', borderRadius: '999px', border: 'none', background: 'transparent', color: '#9C8392', fontWeight: 700, fontSize: '14px', cursor: 'pointer' },
@@ -1352,6 +1555,9 @@ class Component extends DCLogic {
       onOpenLogin: () => this.openLogin(),
       onOpenPhoto: (e) => this.openPhoto(e),
       onPickPhoto: (e) => this.pickPhoto(e),
+      onPickPortrait: (e) => this.pickPortrait(e),
+      onRemovePhoto: (e) => this.removePhoto(e),
+      onRemovePortrait: (e) => this.removePortrait(e),
       onPickVideo: (e) => this.pickVideo(e),
       onOpenVideo: (e) => this.openVideo(e),
       services: [
