@@ -1369,6 +1369,10 @@ class Component extends DCLogic {
       eye: ic(P('M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z'), h('circle', { cx: 12, cy: 12, r: 3 })),
       gem: ic(P('M6 3h12l4 6-10 13L2 9z'), P('M2 9h20'), P('M8 3l-2 6 6 13'), P('M16 3l2 6-6 13')),
       brush: ic(P('M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08'), P('M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z')),
+      wave: ic(P('M2 9c1.5-2 3.5-2 5 0s3.5 2 5 0 3.5-2 5 0 3.5 2 5 0'), P('M2 15c1.5-2 3.5-2 5 0s3.5 2 5 0 3.5-2 5 0 3.5 2 5 0')),
+      wind: ic(P('M9.59 4.59A2 2 0 1 1 11 8H2'), P('M17.73 7.73A2.5 2.5 0 1 1 19.5 12H2'), P('M12.59 19.41A2 2 0 1 0 14 16H2')),
+      crown: ic(P('M3 7l4.5 4L12 5l4.5 6L21 7l-2 11H5z'), h('line', { x1: 6, y1: 20, x2: 18, y2: 20 })),
+      heart: ic(P('M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7z')),
     };
     const galleryItems = [];
     for (let i = 1; i <= this.GALLERY_COUNT; i++) {
@@ -1636,18 +1640,22 @@ class Component extends DCLogic {
       onPickVideo: (e) => this.pickVideo(e),
       onOpenVideo: (e) => this.openVideo(e),
       services: [
-        { iconEl: icons.sparkles, title: 'Luzes & Mechas', desc: 'Iluminados, morena iluminada e loiros dos sonhos sem agredir o fio.', price: 'a partir de R$150' },
-        { iconEl: icons.droplet, title: 'Progressiva & Hidratação', desc: 'Cabelo liso, alinhado e com brilho que dura. Tratamento profundo.', price: 'a partir de R$120' },
-        { iconEl: icons.eye, title: 'Design de Sobrancelha', desc: 'Modelagem que valoriza o seu olhar, com henna ou natural.', price: 'a partir de R$35' },
-        { iconEl: icons.gem, title: 'Unhas & Pés', desc: 'Manicure, pedicure e alongamento com esmaltação impecável.', price: 'a partir de R$40' },
-        { iconEl: icons.brush, title: 'Maquiagem & Cílios', desc: 'Make para festas e dia a dia, extensão e lifting de cílios.', price: 'sob consulta' },
+        { iconEl: icons.sparkles, title: 'Luzes & Mechas', desc: 'Iluminados, morena iluminada e loiros dos sonhos sem agredir o fio.' },
+        { iconEl: icons.droplet, title: 'Progressiva & Hidratação', desc: 'Cabelo liso, alinhado e com brilho que dura. Tratamento profundo.' },
+        { iconEl: icons.wave, title: 'Tratamento para Cachos', desc: 'Cachos definidos, hidratados e cheios de vida. Cuidado especial pro seu tipo de fio.' },
+        { iconEl: icons.wind, title: 'Selagem & Escova', desc: 'Fios selados, alinhados e com aquele acabamento de salão que dura.' },
+        { iconEl: icons.crown, title: 'Penteados', desc: 'Penteados pra festas e ocasiões especiais, do clássico ao moderno.' },
+        { iconEl: icons.heart, title: 'Noivas & Madrinhas', desc: 'Cabelo e make impecáveis pro grande dia. Pacotes para noivas e madrinhas.' },
+        { iconEl: icons.eye, title: 'Design de Sobrancelha', desc: 'Modelagem que valoriza o seu olhar, com henna ou natural.' },
+        { iconEl: icons.gem, title: 'Unhas & Pés', desc: 'Manicure, pedicure e alongamento com esmaltação impecável.' },
+        { iconEl: icons.brush, title: 'Maquiagem & Cílios', desc: 'Make para festas e dia a dia, extensão e lifting de cílios.' },
       ],
       reviews: [
         { text: 'Amei minha progressiva! Cabelo super alinhado e brilhoso. A Ju é muito atenciosa.', name: 'Camila R.', service: 'Progressiva', initials: 'CR' },
         { text: 'Consegui o loiro dos sonhos! Ficou iluminado, sem ressecar o cabelo. Amei o resultado!', name: 'Patrícia L.', service: 'Loiros', initials: 'PL' },
         { text: 'Meus cachos ficaram definidos e cheios de vida. Saio sempre me sentindo linda!', name: 'Aline S.', service: 'Cachos', initials: 'AS' },
       ],
-      tags: ['Mega Cabelo', 'Luzes', 'Progressiva', 'Sobrancelha', 'Unhas', 'Maquiagem'],
+      tags: ['Mega Cabelo', 'Luzes', 'Progressiva', 'Cachos', 'Noivas', 'Sobrancelha', 'Unhas', 'Maquiagem'],
     };
   }
 }
