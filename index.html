@@ -836,6 +836,7 @@
   {{ videoLb }}
   {{ loginModal }}
   {{ adminBar }}
+  {{ saveToast }}
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script="">
@@ -849,7 +850,8 @@ class Component extends DCLogic {
     messagingSenderId: "299586684619",
     appId: "1:299586684619:web:2156f76cbc83b5fafc7d4e"
   };
-  state = { cd: { d: '00', h: '00', m: '00', s: '00' }, lb: { open: false, index: 0, anim: 0 }, vlb: { open: false, url: null, anim: 0 }, adminMode: false, loginOpen: false, loginErr: false, loginBusy: false, menuOpen: false };
+  state = { cd: { d: '00', h: '00', m: '00', s: '00' }, lb: { open: false, index: 0, anim: 0 }, vlb: { open: false, url: null, anim: 0 }, adminMode: false, loginOpen: false, loginErr: false, loginBusy: false, menuOpen: false, pending: 0, saving: false, toast: { show: false, ok: true, msg: '' } };
+  _pending = { gallery: {}, portraits: {} };
 
   // Liga o Firebase: autenticação + banco (Firestore).
   initFirebase() {
@@ -859,6 +861,7 @@ class Component extends DCLogic {
       if (!firebase.apps || !firebase.apps.length) firebase.initializeApp(this.FB_CONFIG);
       this._auth = firebase.auth();
       this._db = firebase.firestore();
+      try { this._auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
       this._fbInit = true;
       this._auth.onAuthStateChanged((user) => {
         this.setState({ adminMode: !!user, loginOpen: false, loginErr: false, loginBusy: false });
@@ -885,7 +888,7 @@ class Component extends DCLogic {
     this.buildPortraits();
   }
 
-  openLogin() { this._pw = ''; this.setState({ loginOpen: true, loginErr: false, menuOpen: false }); }
+  openLogin() { if (this.state.adminMode) return; this._pw = ''; this.setState({ loginOpen: true, loginErr: false, menuOpen: false }); }
   toggleMenu() { this.setState({ menuOpen: !this.state.menuOpen }); }
   closeMenu() { this.setState({ menuOpen: false }); }
   closeLogin() { this.setState({ loginOpen: false, loginErr: false, loginBusy: false }); }
@@ -1050,27 +1053,23 @@ class Component extends DCLogic {
     try {
       const dataUrl = await this.resizePhoto(file, 900);
       if (dataUrl.length > 950000) { alert('Essa imagem ficou muito grande. Tente uma foto um pouco menor.'); return; }
-      // Mostra na hora
+      // Mostra na hora como prévia
       const root = (this.el && this.el.shadowRoot) || document;
       const img = root.querySelector('[data-gimg="' + idx + '"]') || document.querySelector('[data-gimg="' + idx + '"]');
       const empty = root.querySelector('[data-gempty="' + idx + '"]') || document.querySelector('[data-gempty="' + idx + '"]');
       if (img) { img.style.backgroundImage = 'url("' + dataUrl + '")'; img.style.display = 'block'; }
       if (empty) empty.style.display = 'none';
-      // Salva no Firebase (vale para todos os dispositivos)
+      // Guarda como alteração pendente (só vai pro Firebase ao clicar em Salvar)
       this._fbGallery = this._fbGallery || {};
       this._fbGallery[idx] = dataUrl;
-      if (this._db) {
-        await this._db.collection('gallery').doc(String(idx)).set({ url: dataUrl, ts: Date.now() });
-      } else {
-        alert('Foto exibida, mas o Firebase não está disponível agora — ela pode não ficar salva online. Recarregue e tente de novo.');
-      }
+      this._pending.gallery[idx] = dataUrl;
+      this.setState({ pending: this.pendingCount() });
     } catch (e) {
-      alert('Não foi possível salvar essa imagem. Verifique sua conexão e tente outra.');
+      alert('Não foi possível carregar essa imagem. Tente outra.');
     }
   }
 
-  // Remove a foto enviada de uma vaga da galeria e volta ao padrão
-  // (fotos 1-7 voltam à original; 8-12 voltam a ficar vazias).
+  // Marca a foto da galeria para excluir (volta à original) — confirma ao Salvar.
   removePhoto(e) {
     if (e && e.stopPropagation) e.stopPropagation();
     if (!this.state.adminMode) return;
@@ -1080,8 +1079,9 @@ class Component extends DCLogic {
     if (!idx) return;
     if (!confirm('Excluir esta foto? Ela voltará para a foto original do site.')) return;
     if (this._fbGallery) delete this._fbGallery[idx];
+    this._pending.gallery[idx] = null;
     this.buildGallery();
-    if (this._db) { this._db.collection('gallery').doc(String(idx)).delete().catch(() => {}); }
+    this.setState({ pending: this.pendingCount() });
   }
 
   resizePhoto(file, maxW) {
@@ -1159,13 +1159,10 @@ class Component extends DCLogic {
       if (img) img.src = dataUrl;
       this._fbPortraits = this._fbPortraits || {};
       this._fbPortraits[key] = dataUrl;
-      if (this._db) {
-        await this._db.collection('portraits').doc(String(key)).set({ url: dataUrl, ts: Date.now() });
-      } else {
-        alert('Foto exibida, mas o Firebase não está disponível agora — ela pode não ficar salva online. Recarregue e tente de novo.');
-      }
+      this._pending.portraits[key] = dataUrl;
+      this.setState({ pending: this.pendingCount() });
     } catch (e) {
-      alert('Não foi possível salvar essa imagem. Verifique sua conexão e tente outra.');
+      alert('Não foi possível carregar essa imagem. Tente outra.');
     }
   }
 
@@ -1180,10 +1177,54 @@ class Component extends DCLogic {
     if (!key) return;
     if (!confirm('Excluir esta foto? Ela voltará para a foto original do site.')) return;
     if (this._fbPortraits) delete this._fbPortraits[key];
+    this._pending.portraits[key] = null;
     const root = (this.el && this.el.shadowRoot) || document;
     const img = root.querySelector('[data-pimg="' + key + '"]') || document.querySelector('[data-pimg="' + key + '"]');
     if (img) img.src = this.PORTRAIT_DEFAULT[key] || img.src;
-    if (this._db) { this._db.collection('portraits').doc(String(key)).delete().catch(() => {}); }
+    this.setState({ pending: this.pendingCount() });
+  }
+
+  // Quantas alterações ainda não foram salvas no Firebase.
+  pendingCount() {
+    const g = Object.keys(this._pending.gallery || {}).length;
+    const p = Object.keys(this._pending.portraits || {}).length;
+    return g + p;
+  }
+
+  showToast(ok, msg) {
+    this.setState({ toast: { show: true, ok: ok, msg: msg } });
+    clearTimeout(this._toastT);
+    this._toastT = setTimeout(() => {
+      this.setState({ toast: { show: false, ok: ok, msg: msg } });
+    }, 3200);
+  }
+
+  // Grava no Firebase todas as alterações pendentes (fotos novas e exclusões).
+  async saveChanges() {
+    if (this.state.saving) return;
+    if (!this._db) { this.showToast(false, 'Firebase indisponível. Recarregue a página e tente de novo.'); return; }
+    if (this.pendingCount() === 0) { this.showToast(true, 'Nada para salvar.'); return; }
+    this.setState({ saving: true });
+    try {
+      const ops = [];
+      const g = this._pending.gallery || {};
+      Object.keys(g).forEach((idx) => {
+        if (g[idx] === null) ops.push(this._db.collection('gallery').doc(String(idx)).delete());
+        else ops.push(this._db.collection('gallery').doc(String(idx)).set({ url: g[idx], ts: Date.now() }));
+      });
+      const p = this._pending.portraits || {};
+      Object.keys(p).forEach((key) => {
+        if (p[key] === null) ops.push(this._db.collection('portraits').doc(String(key)).delete());
+        else ops.push(this._db.collection('portraits').doc(String(key)).set({ url: p[key], ts: Date.now() }));
+      });
+      await Promise.all(ops);
+      this._pending = { gallery: {}, portraits: {} };
+      this.setState({ saving: false, pending: 0 });
+      this.showToast(true, 'Alterações salvas com sucesso! Já valem para todas as clientes.');
+    } catch (e) {
+      this.setState({ saving: false });
+      this.showToast(false, 'Não foi possível salvar. Verifique sua conexão e tente de novo.');
+    }
   }
 
 
@@ -1523,22 +1564,54 @@ class Component extends DCLogic {
     );
 
     // ---- Admin bar (shown only when logged in) ----
+    const pend = this.state.pending || 0;
     const adminBar = this.state.adminMode ? h('div', {
       style: {
         position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 9997,
-        display: 'flex', alignItems: 'center', gap: '14px', padding: '11px 18px', borderRadius: '999px',
+        display: 'flex', alignItems: 'center', gap: '12px', padding: '11px 18px', borderRadius: '999px',
         background: 'rgba(13,5,20,.92)', border: '1px solid rgba(164,53,239,.4)',
-        backdropFilter: 'blur(10px)', boxShadow: '0 14px 34px rgba(0,0,0,.5)',
+        backdropFilter: 'blur(10px)', boxShadow: '0 14px 34px rgba(0,0,0,.5)', maxWidth: '94vw', flexWrap: 'wrap', justifyContent: 'center',
       },
     },
       h('span', { key: 'd', style: { display: 'inline-flex', alignItems: 'center', gap: '7px', color: '#C9A6F3', fontSize: '13px', fontWeight: 700 } },
         h('span', { style: { width: '8px', height: '8px', borderRadius: '50%', background: '#28d17c', display: 'inline-block' } }),
-        'Modo administradora — clique no ícone de câmera nas fotos para trocar'),
+        pend > 0 ? (pend === 1 ? '1 alteração não salva' : (pend + ' alterações não salvas')) : 'Modo administradora — troque as fotos pelos ícones'),
+      pend > 0 ? h('button', {
+        key: 'save', onClick: () => this.saveChanges(),
+        style: {
+          padding: '9px 20px', borderRadius: '999px', border: 'none',
+          background: this.state.saving ? 'rgba(40,209,124,.5)' : 'linear-gradient(135deg,#28d17c,#11a85e)',
+          color: '#fff', fontWeight: 800, fontSize: '13px', cursor: this.state.saving ? 'default' : 'pointer',
+          boxShadow: '0 8px 20px rgba(40,209,124,.4)', display: 'inline-flex', alignItems: 'center', gap: '7px',
+        },
+      },
+        h('svg', { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none', stroke: '#fff', strokeWidth: 2.2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+          h('path', { d: 'M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z' }), h('path', { d: 'M17 21v-8H7v8M7 3v5h8' })),
+        this.state.saving ? 'Salvando…' : 'Salvar alterações') : null,
       h('button', {
         key: 'o', onClick: () => this.logout(),
         style: { padding: '7px 14px', borderRadius: '999px', border: '1px solid rgba(255,255,255,.2)', background: 'transparent', color: '#fff', fontWeight: 700, fontSize: '13px', cursor: 'pointer' },
       }, 'Sair')
     ) : null;
+
+    // ---- Aviso de sucesso/erro ao salvar ----
+    const tst = this.state.toast || { show: false, ok: true, msg: '' };
+    const saveToast = h('div', {
+      style: {
+        position: 'fixed', top: '22px', left: '50%', zIndex: 10001,
+        transform: 'translateX(-50%) translateY(' + (tst.show ? '0' : '-22px') + ')',
+        opacity: tst.show ? 1 : 0, visibility: tst.show ? 'visible' : 'hidden',
+        transition: 'opacity .3s ease, transform .3s ease, visibility .3s ease',
+        display: 'flex', alignItems: 'center', gap: '10px', padding: '13px 20px', borderRadius: '14px',
+        background: tst.ok ? 'linear-gradient(135deg,#1d7a48,#11a85e)' : 'linear-gradient(135deg,#7a1d2e,#c0392b)',
+        color: '#fff', fontWeight: 700, fontSize: '14px', maxWidth: '92vw',
+        boxShadow: '0 16px 40px rgba(0,0,0,.5)', border: '1px solid rgba(255,255,255,.18)',
+      },
+    },
+      h('svg', { key: 'i', width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: '#fff', strokeWidth: 2.4, strokeLinecap: 'round', strokeLinejoin: 'round' },
+        tst.ok ? h('path', { d: 'M20 6L9 17l-5-5' }) : h('path', { d: 'M18 6L6 18M6 6l12 12' })),
+      h('span', { key: 'm' }, tst.msg)
+    );
 
     return {
       cd: this.state.cd,
@@ -1548,6 +1621,7 @@ class Component extends DCLogic {
       videoLb: videoLb,
       loginModal: loginModal,
       adminBar: adminBar,
+      saveToast: saveToast,
       adminMode: this.state.adminMode,
       menuOpen: this.state.menuOpen,
       onToggleMenu: () => this.toggleMenu(),
@@ -1558,6 +1632,7 @@ class Component extends DCLogic {
       onPickPortrait: (e) => this.pickPortrait(e),
       onRemovePhoto: (e) => this.removePhoto(e),
       onRemovePortrait: (e) => this.removePortrait(e),
+      onSaveChanges: () => this.saveChanges(),
       onPickVideo: (e) => this.pickVideo(e),
       onOpenVideo: (e) => this.openVideo(e),
       services: [
